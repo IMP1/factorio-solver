@@ -7,14 +7,19 @@ module FactorioCalculator
         attr_reader :nodes
         attr_reader :edges
 
-        def initialize(nodes, edges)
+        def initialize(nodes, edges, name="factorio-calculator")
             @nodes = nodes
             @edges = edges
+            @name  = name
         end
 
         def to_s
-            str = "digraph \"#{nodes.first.item}\" {\n"
+            str = "digraph \"#{@name}\" {\n"
             str += "\tnode [width = 1, margin = 0.2];\n"
+
+            source_nodes = nodes.select { |node| node.is_a?(Throughput) }
+            sink_nodes = nodes.select { |node| nodes.none? { |n| n.is_a?(Crafter) && n.inputs.any? { |i| i.item == node.item } } }
+
             nodes.each do |node|
                 shape = "box"
                 shape = "trapezium" if node.item.include?("plate")
@@ -30,20 +35,18 @@ module FactorioCalculator
                 margin = 0 if shape != "box"
 
                 count = node.is_a?(Throughput) ? "" : node.count.to_s + " "
-                label = "#{count}#{node.item}\\n(#{amount.numerator} / #{amount.denominator}s)"
+                label = "#{count}#{node.item}\\n(#{amount.numerator} / #{amount.denominator == 1 ? "" : amount.denominator}s)"
 
                 str += "\t\"#{node.item}\" [ shape = #{shape}"
                 str += ", margin = #{margin}"
                 str += ", width = #{width}"
                 str += ", label = \"#{label}\""
-                # TODO: 
-                #   Have all inputs be in same row
-                #   Have all final products be in same row.
-                #   Check out page 16 in this for how to? https://graphviz.gitlab.io/_pages/pdf/dotguide.pdf
-                str += ", rank = source" if node.is_a?(Throughput)
-                str += ", rank = sink" if nodes.none? { |n| n.is_a?(Crafter) && n.inputs.any? { |i| i.item == node.item } }
                 str += " ];\n"
             end
+
+            str += "\t{ rank = same; #{source_nodes.map{ |n| "\"#{n.item}\"; " }.join} }\n"
+            str += "\t{ rank = same; #{sink_nodes.map{ |n| "\"#{n.item}\"; " }.join} }\n"
+
             edges.each do |target, sources|
                 sources.each do |source|
                     source_node = @nodes.find { |n| n.item == source }
@@ -51,11 +54,6 @@ module FactorioCalculator
                     target_input = target_node.inputs.find { |n| n.item == source }
                     total_output = source_node.amount_per_second
                     partial_input = target_input.amount_per_second
-                    # puts
-                    # p source_node
-                    # p target_node
-                    # p target_input
-                    # puts
                     fraction = partial_input / total_output
                     str += "\t\"#{source}\" -> \"#{target}\" ["
                     str += " label = \"#{fraction}\"" if fraction != 1
