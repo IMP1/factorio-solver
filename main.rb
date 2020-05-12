@@ -72,27 +72,15 @@ LOGISTIC_ITEMS = [
 ]
 
 science_trees = SCIENCE_PACKS.map do |pack_name, amount_per_second|
-    tree = FactorioCalculator.recipe_tree(pack_name, amount_per_second)
+    FactorioCalculator.recipe_tree(pack_name, amount_per_second)
 end
 science_graph = FactorioCalculator.collapsed_graph(*science_trees)
 puts science_graph
 # FactorioCalculator.show_svg(science_graph)
-# SCIENCE_PACKS.each do |pack, amount_per_second|
-#     tree = recipe_tree(base_recipes, pack, amount_per_second)
-#     raw_inputs = leaves(tree).group_by { |raw| raw.item }.map { |item, group| group.inject(:+) }
-#     puts tree
-#     puts
-#     puts raw_inputs
-#     puts
-#     puts "--------"
-#     puts
-# end
 
-
-#--------
-
-
-
-# tree = FactorioCalculator.recipe_tree('logistic-science-pack', 2)
-# graph = FactorioCalculator.collapsed_graph(tree)
-# FactorioCalculator.show_svg(graph)
+logistic_trees = LOGISTIC_ITEMS.map do |item_name|
+    FactorioCalculator.recipe_tree(item_name)
+end
+logistic_graph = FactorioCalculator.collapsed_graph(*logistic_trees)
+puts logistic_graph
+# FactorioCalculator.show_svg(logistic_graph)
