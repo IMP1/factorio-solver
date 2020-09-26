@@ -7,12 +7,12 @@ ENDGAME_PARTS = {
 }
 
 SCIENCE_PACKS = {
-    "automation-science-pack" => 2,
-    "logistic-science-pack" => 2,
-    "military-science-pack" => 2,
-    "production-science-pack" => 2,
+    # "automation-science-pack" => 2,
+    # "logistic-science-pack" => 2,
+    # "military-science-pack" => 2,
     "chemical-science-pack" => 2,
-    "utility-science-pack" => 2,
+    # "production-science-pack" => 2,
+    # "utility-science-pack" => 2,
 }
 
 LOGISTIC_ITEMS = [
@@ -76,11 +76,18 @@ science_trees = SCIENCE_PACKS.map do |pack_name, amount_per_second|
 end
 science_graph = FactorioCalculator.collapsed_graph(*science_trees)
 puts science_graph
+puts
+science_trees.each do |tree|
+    graph = FactorioCalculator.collapsed_graph(tree)
+    puts graph
+    puts
+end
 # FactorioCalculator.show_svg(science_graph)
 
-logistic_trees = LOGISTIC_ITEMS.map do |item_name|
-    FactorioCalculator.recipe_tree(item_name)
-end
-logistic_graph = FactorioCalculator.collapsed_graph(*logistic_trees)
-puts logistic_graph
+# logistic_trees = LOGISTIC_ITEMS.map do |item_name|
+#     FactorioCalculator.recipe_tree(item_name)
+# end
+# logistic_graph = FactorioCalculator.collapsed_graph(*logistic_trees)
+# puts logistic_graph
+# puts
 # FactorioCalculator.show_svg(logistic_graph)
